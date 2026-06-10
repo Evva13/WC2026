@@ -39,7 +39,7 @@ export async function login(username, password) {
       .from('users').select('*').eq('username', username).single()
     if (error || !data) return { error: 'Kullanıcı bulunamadı.' }
     if (data.password_hash !== password) return { error: 'Şifre hatalı.' }
-    return { user: { id: data.id, username: data.username, isAdmin: data.is_admin, score: data.score } }
+    return { user: { id: data.id, username: data.username, isAdmin: data.is_admin === true, score: data.score } }
   } else {
     const users = ls('wc_users', {})
     const user = users[username]
@@ -129,9 +129,9 @@ export async function loadLeaderboard() {
   if (useSupabase) {
     const { data } = await supabase
       .from('users').select('username, score, is_admin')
-      .eq('is_admin', false).order('score', { ascending: false })
+      .order('score', { ascending: false })
     return (data || []).map(u => ({
-      username: u.username, score: u.score,
+      username: u.username, score: u.score, isAdmin: u.is_admin,
     }))
   } else {
     const users = ls('wc_users', {})
