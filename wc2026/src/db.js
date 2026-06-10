@@ -136,7 +136,6 @@ export async function loadLeaderboard() {
   } else {
     const users = ls('wc_users', {})
     return Object.values(users)
-      .filter(u => !u.isAdmin)
       .sort((a, b) => (b.score || 0) - (a.score || 0))
       .map(u => ({
         username: u.username, score: u.score || 0,
