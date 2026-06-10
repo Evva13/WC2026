@@ -45,14 +45,15 @@ export default function LeaderboardTab({ currentUser }) {
               <div key={row.username} className="lb-row">
                 <div
                   className="rank-c"
-                  style={{ background: i < 3 ? BG[i] : '#e0e0d8', color: i < 3 ? '#fff' : '#888' }}
+                  style={{ background: row.isAdmin ? '#f0f0ec' : i < 3 ? BG[i] : '#e0e0d8', color: row.isAdmin ? '#888' : i < 3 ? '#fff' : '#888' }}
                 >
-                  {i < 3 ? MEDALS[i] : i + 1}
+                  {row.isAdmin ? '⚙' : i < 3 ? MEDALS[i] : i + 1}
                 </div>
                 <div style={{ flex: 1 }}>
                   <div style={{ fontWeight: 600, fontSize: 15, display: 'flex', alignItems: 'center', gap: 6 }}>
                     {row.username}
                     {isMe && <span className="pill pill-p">Sen</span>}
+                    {row.isAdmin && <span className="pill" style={{ background: '#f0f0ec', color: '#888' }}>Yönetici</span>}
                   </div>
                   <div style={{ fontSize: 11, color: '#aaa', marginTop: 2 }}>
                     {row.matchCount != null ? `${row.matchCount}/72 maç` : ''}{' '}
