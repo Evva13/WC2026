@@ -48,11 +48,15 @@ export default function MatchesTab({ userId, predictions, setPredictions, result
     setTimeout(() => setSavedOk(false), 2000)
   }
 
-  // Türkiye saatiyle kickoff göster
+  // Türkiye saatiyle kickoff göster (tarih + saat)
   const formatKickoff = (isoStr) => {
     if (!isoStr) return null
     const d = new Date(isoStr)
-    return d.toLocaleString('tr-TR', { timeZone: 'Europe/Istanbul', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+    return d.toLocaleString('tr-TR', {
+      timeZone: 'Europe/Istanbul',
+      day: 'numeric', month: 'long',
+      hour: '2-digit', minute: '2-digit'
+    })
   }
 
   const matches = getGroupMatches(activeGroup)
@@ -126,36 +130,35 @@ export default function MatchesTab({ userId, predictions, setPredictions, result
             <div key={key} className="match-row">
               <div style={{ flex: 1, textAlign: 'right' }}>
                 <div className="match-team right">{FLAGS[home]} {home}</div>
-                {kickoff && !result && (
-                  <div style={{ fontSize: 10, color: open ? '#27ae60' : '#e07000', marginTop: 1 }}>
-                    {open ? `⏰ ${kickoff}` : `🔒 ${kickoff}`}
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <input
+                    className={`num-in${locked ? ' locked' : ''}`}
+                    type="number" min="0" max="30" placeholder="–"
+                    value={hv} readOnly={locked}
+                    onChange={e => handleChange(key, 'home', e.target.value)}
+                  />
+                  <span style={{ color: '#ccc', fontSize: 20, fontWeight: 300 }}>:</span>
+                  <input
+                    className={`num-in${locked ? ' locked' : ''}`}
+                    type="number" min="0" max="30" placeholder="–"
+                    value={av} readOnly={locked}
+                    onChange={e => handleChange(key, 'away', e.target.value)}
+                  />
+                </div>
+                {kickoff && (
+                  <div style={{ fontSize: 10, color: open ? '#27ae60' : result ? '#aaa' : '#e07000', whiteSpace: 'nowrap' }}>
+                    {result ? `⚽ ${result.home}:${result.away}` : open ? `🗓 ${kickoff}` : `🔒 ${kickoff}`}
                   </div>
                 )}
               </div>
-              <input
-                className={`num-in${locked ? ' locked' : ''}`}
-                type="number" min="0" max="30" placeholder="–"
-                value={hv} readOnly={locked}
-                onChange={e => handleChange(key, 'home', e.target.value)}
-              />
-              <span style={{ color: '#ccc', fontSize: 20, fontWeight: 300, flexShrink: 0 }}>:</span>
-              <input
-                className={`num-in${locked ? ' locked' : ''}`}
-                type="number" min="0" max="30" placeholder="–"
-                value={av} readOnly={locked}
-                onChange={e => handleChange(key, 'away', e.target.value)}
-              />
               <div style={{ flex: 1 }}>
                 <div className="match-team">{FLAGS[away]} {away}</div>
               </div>
-              <span style={{ minWidth: 90, textAlign: 'right' }}>
+              <span style={{ minWidth: 70, textAlign: 'right' }}>
                 {outcomePill}
                 {ptsPill}
-                {result && (
-                  <span style={{ fontSize: 11, color: '#aaa', marginLeft: 4 }}>
-                    ⚽ {result.home}:{result.away}
-                  </span>
-                )}
               </span>
             </div>
           )
