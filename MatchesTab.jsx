@@ -60,6 +60,10 @@ export default function MatchesTab({ userId, predictions, setPredictions, result
 
   return (
     <div>
+      <div style={{ background: '#e6f1fb', border: '0.5px solid #b2d0f0', borderRadius: 10, padding: '12px 16px', marginBottom: 16, fontSize: 13, color: '#185fa5', lineHeight: 1.6 }}>
+        ⏰ <b>Hatırlatma:</b> Her maç başlamadan <b>1 saat önce</b> o maçın tahmini otomatik kilitlenir. Tahminlerini zamanında gir!
+      </div>
+
       {!groupHasOpenMatch && (
         <div style={{ background: '#fceaea', border: '0.5px solid #f0b8b8', borderRadius: 10, padding: '12px 16px', marginBottom: 16, fontSize: 13, color: '#a32d2d', fontWeight: 500 }}>
           🔒 Bu grubun tüm maçları başladı — tahmin girilemez.
