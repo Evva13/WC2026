@@ -149,7 +149,7 @@ export async function loadLeaderboard() {
 
 export async function updateAllScores(results, calcMatchPoints, calcStandingPoints) {
   if (useSupabase) {
-    const { data: users } = await supabase.from('users').select('id').eq('is_admin', false)
+    const { data: users } = await supabase.from('users').select('id')
     for (const user of users || []) {
       const preds = await loadPredictions(user.id)
       let score = 0
@@ -162,7 +162,6 @@ export async function updateAllScores(results, calcMatchPoints, calcStandingPoin
   } else {
     const users = ls('wc_users', {})
     Object.values(users).forEach(user => {
-      if (user.isAdmin) return
       let score = 0
       Object.entries(user.predictions?.matches || {}).forEach(([key, pred]) => {
         const pts = calcMatchPoints(pred, results[key])
