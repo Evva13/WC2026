@@ -149,16 +149,20 @@ export async function loadLeaderboard() {
 
 export async function updateAllScores(results, calcMatchPoints, calcStandingPoints) {
   if (useSupabase) {
-    const { data: users } = await supabase.from('users').select('id')
-    for (const user of users || []) {
-      const preds = await loadPredictions(user.id)
-      let score = 0
-      Object.entries(preds.matches).forEach(([key, pred]) => {
-        const pts = calcMatchPoints(pred, results[key])
-        if (pts != null) score += pts
-      })
-      await supabase.from('users').update({ score }).eq('id', user.id)
-    }
+    // Direkt SQL ile tüm kullanıcıların puanlarını hesapla (admin dahil)
+    await supabase.rpc('calculate_all_scores').catch(async () => {
+      // RPC yoksa manuel hesapla
+      const { data: users } = await supabase.from('users').select('id')
+      for (const user of users || []) {
+        const preds = await loadPredictions(user.id)
+        let score = 0
+        Object.entries(preds.matches).forEach(([key, pred]) => {
+          const pts = calcMatchPoints(pred, results[key])
+          if (pts != null) score += pts
+        })
+        await supabase.from('users').update({ score }).eq('id', user.id)
+      }
+    })
   } else {
     const users = ls('wc_users', {})
     Object.values(users).forEach(user => {
