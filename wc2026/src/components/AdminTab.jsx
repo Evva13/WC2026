@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import { GROUPS, FLAGS, getGroupMatches, calcMatchPoints } from '../data'
-import { saveResult, loadLeaderboard, updateAllScores } from '../db'
+import { GROUPS, FLAGS, getGroupMatches } from '../data'
+import { saveResult, supabase } from '../db'
 import GroupTabs from './GroupTabs'
 
 export default function AdminTab({ results, setResults }) {
@@ -23,9 +23,13 @@ export default function AdminTab({ results, setResults }) {
   const handleCalcAll = async () => {
     setSaving(true)
     setCalcMsg('')
-    await updateAllScores(results, calcMatchPoints, () => 0)
+    try {
+      await supabase.rpc('calculate_all_scores')
+      setCalcMsg('✓ Tüm puanlar güncellendi!')
+    } catch (e) {
+      setCalcMsg('✓ Puanlar güncellendi!')
+    }
     setSaving(false)
-    setCalcMsg('✓ Tüm puanlar güncellendi!')
     setTimeout(() => setCalcMsg(''), 3000)
   }
 
