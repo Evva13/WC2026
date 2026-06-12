@@ -1,5 +1,7 @@
 import { supabase } from './supabase'
 
+export { supabase }
+
 const useSupabase = !!supabase
 
 // ─── localStorage helpers ───────────────────────────────────────────────────
