@@ -24,13 +24,45 @@ export default function AdminTab({ results, setResults }) {
     setSaving(true)
     setCalcMsg('')
     try {
-      await supabase.rpc('calculate_all_scores')
+      const { error } = await supabase.from('users').select('id').limit(1)
+      if (error) throw error
+
+      // Direkt SQL ile tüm puanları hesapla
+      const { data: allUsers } = await supabase.from('users').select('id')
+      for (const user of allUsers || []) {
+        const { data: preds } = await supabase
+          .from('match_predictions')
+          .select('match_key, home_score, away_score')
+          .eq('user_id', user.id)
+
+        const { data: results } = await supabase
+          .from('match_results')
+          .select('match_key, home_score, away_score')
+
+        const resultsMap = {}
+        ;(results || []).forEach(r => { resultsMap[r.match_key] = r })
+
+        let score = 0
+        ;(preds || []).forEach(p => {
+          const r = resultsMap[p.match_key]
+          if (!r || p.home_score == null || p.away_score == null) return
+          if (p.home_score === r.home_score && p.away_score === r.away_score) {
+            score += 5
+          } else {
+            const pw = p.home_score > p.away_score ? 'h' : p.home_score < p.away_score ? 'a' : 'd'
+            const rw = r.home_score > r.away_score ? 'h' : r.home_score < r.away_score ? 'a' : 'd'
+            if (pw === rw) score += 3
+          }
+        })
+
+        await supabase.from('users').update({ score }).eq('id', user.id)
+      }
       setCalcMsg('✓ Tüm puanlar güncellendi!')
     } catch (e) {
-      setCalcMsg('✓ Puanlar güncellendi!')
+      setCalcMsg('Hata: ' + e.message)
     }
     setSaving(false)
-    setTimeout(() => setCalcMsg(''), 3000)
+    setTimeout(() => setCalcMsg(''), 4000)
   }
 
   const enteredCount = Object.values(results).filter(r => r.home != null && r.away != null).length
