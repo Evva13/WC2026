@@ -3,6 +3,7 @@ const WC_LOGO = 'https://assets.football-logos.cc/logos/tournaments/1500x1500/fi
 const TABS = [
   { id: 'matches', label: 'Maçlar' },
   { id: 'standings', label: 'Sıralamalar' },
+  { id: 'bracket', label: '🏆 Eleme' },
   { id: 'leaderboard', label: 'Puan Tablosu' },
 ]
 
