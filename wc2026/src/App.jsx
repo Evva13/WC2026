@@ -1,25 +1,22 @@
 import { useState, useEffect } from 'react'
-import { loadPredictions, loadResults } from './db'
+import { loadPredictions, loadResults, loadBracketPrediction } from './db'
 import LoginPage from './components/LoginPage'
 import Header from './components/Header'
 import MatchesTab from './components/MatchesTab'
 import StandingsTab from './components/StandingsTab'
+import BracketTab from './components/BracketTab'
 import LeaderboardTab from './components/LeaderboardTab'
 import AdminTab from './components/AdminTab'
 
 export default function App() {
   const [user, setUser] = useState(null)
   const [tab, setTab] = useState('matches')
-
-  // predictions: flat { matchKey: {home, away} }
   const [matchPreds, setMatchPreds] = useState({})
-  // standings: { groupKey: { 1: team, 2: team, ... } }
   const [standPreds, setStandPreds] = useState({})
-  // results (admin view)
+  const [bracketPreds, setBracketPreds] = useState({ winners: {}, champion: '' })
   const [results, setResults] = useState({})
   const [loading, setLoading] = useState(false)
 
-  // Restore session
   useEffect(() => {
     const saved = sessionStorage.getItem('wc_session')
     if (saved) {
@@ -36,6 +33,8 @@ export default function App() {
     setStandPreds(preds.standings || {})
     const res = await loadResults()
     setResults(res)
+    const bracket = await loadBracketPrediction(u.id)
+    setBracketPreds(bracket)
     setLoading(false)
   }
 
@@ -43,6 +42,7 @@ export default function App() {
     setUser(null)
     setMatchPreds({})
     setStandPreds({})
+    setBracketPreds({ winners: {}, champion: '' })
     setResults({})
     setTab('matches')
     sessionStorage.removeItem('wc_session')
@@ -59,7 +59,6 @@ export default function App() {
   return (
     <div className="page">
       <Header user={user} activeTab={tab} onTab={setTab} onLogout={handleLogout} />
-
       <div className="content">
         {tab === 'matches' && (
           <MatchesTab
@@ -74,6 +73,15 @@ export default function App() {
             userId={user.id}
             standings={standPreds}
             setStandings={setStandPreds}
+          />
+        )}
+        {tab === 'bracket' && (
+          <BracketTab
+            userId={user.id}
+            bracketPreds={bracketPreds}
+            setBracketPreds={setBracketPreds}
+            bracketResults={results}
+            locked={false}
           />
         )}
         {tab === 'leaderboard' && (
