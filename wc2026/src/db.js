@@ -126,6 +126,34 @@ export async function saveResult(matchKey, home, away) {
   }
 }
 
+// ─── BRACKET (eleme aşaması) ─────────────────────────────────────────────────
+export async function loadBracketPrediction(userId) {
+  if (useSupabase) {
+    const { data } = await supabase
+      .from('bracket_predictions').select('*').eq('user_id', userId).single()
+    if (!data) return { winners: {}, champion: '' }
+    return { winners: data.winners || {}, champion: data.champion || '' }
+  } else {
+    const users = ls('wc_users', {})
+    return users[userId]?.bracket || { winners: {}, champion: '' }
+  }
+}
+
+export async function saveBracketPrediction(userId, bracketPreds) {
+  if (useSupabase) {
+    await supabase.from('bracket_predictions').upsert({
+      user_id: userId,
+      winners: bracketPreds.winners || {},
+      champion: bracketPreds.champion || '',
+    }, { onConflict: 'user_id' })
+  } else {
+    const users = ls('wc_users', {})
+    if (!users[userId]) return
+    users[userId].bracket = bracketPreds
+    lsSet('wc_users', users)
+  }
+}
+
 // ─── LEADERBOARD ─────────────────────────────────────────────────────────────
 export async function loadLeaderboard() {
   if (useSupabase) {
