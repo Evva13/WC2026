@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { GROUPS, FLAGS, getGroupMatches } from '../data'
+import { GROUPS, FLAGS, getGroupMatches, FINAL_STANDINGS, calcStandingPoints } from '../data'
 import { saveResult, supabase } from '../db'
 import GroupTabs from './GroupTabs'
 
@@ -35,6 +35,11 @@ export default function AdminTab({ results, setResults }) {
           .select('match_key, home_score, away_score')
           .eq('user_id', user.id)
 
+        const { data: standPreds } = await supabase
+          .from('standing_predictions')
+          .select('grp, rank1, rank2, rank3, rank4')
+          .eq('user_id', user.id)
+
         const { data: results } = await supabase
           .from('match_results')
           .select('match_key, home_score, away_score')
@@ -43,6 +48,8 @@ export default function AdminTab({ results, setResults }) {
         ;(results || []).forEach(r => { resultsMap[r.match_key] = r })
 
         let score = 0
+
+        // Maç tahmini puanları
         ;(preds || []).forEach(p => {
           const r = resultsMap[p.match_key]
           if (!r || p.home_score == null || p.away_score == null) return
@@ -55,9 +62,17 @@ export default function AdminTab({ results, setResults }) {
           }
         })
 
+        // Grup sıralaması tahmini puanları
+        ;(standPreds || []).forEach(sp => {
+          const actual = FINAL_STANDINGS[sp.grp]
+          if (!actual) return
+          const pred = { 1: sp.rank1, 2: sp.rank2, 3: sp.rank3, 4: sp.rank4 }
+          score += calcStandingPoints(pred, actual)
+        })
+
         await supabase.from('users').update({ score }).eq('id', user.id)
       }
-      setCalcMsg('✓ Tüm puanlar güncellendi!')
+      setCalcMsg('✓ Tüm puanlar güncellendi! (maç + grup sıralaması)')
     } catch (e) {
       setCalcMsg('Hata: ' + e.message)
     }
@@ -149,6 +164,18 @@ export default function AdminTab({ results, setResults }) {
           Tam skor <b>+5 puan</b> · Doğru sonuç (kazanan/beraberlik) <b>+3 puan</b><br />
           Grup sıralaması 1. veya 2. doğru <b>+5 puan</b> · 3. veya 4. doğru <b>+2 puan</b>
         </p>
+      </div>
+
+      <div className="card" style={{ marginTop: 12 }}>
+        <div style={{ fontWeight: 700, fontSize: 14, marginBottom: 10 }}>📋 Kesin Grup Sıralamaları (referans)</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 10 }}>
+          {Object.entries(FINAL_STANDINGS).map(([g, st]) => (
+            <div key={g} style={{ fontSize: 11, color: '#666' }}>
+              <b style={{ color: '#1a1a1a' }}>Grup {g}</b><br />
+              1. {st[1]}<br />2. {st[2]}<br />3. {st[3]}<br />4. {st[4]}
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   )
