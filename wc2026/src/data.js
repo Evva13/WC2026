@@ -127,6 +127,23 @@ export const MATCH_TIMES = {
   'Gana_Panama':                         '2026-06-17T23:00:00Z', // 18 Haz 02:00
 }
 
+// Grup aşaması KESİN sonuçları (28 Haziran 2026'da tamamlandı)
+// { 1: şampiyon, 2: ikinci, 3: üçüncü, 4: dördüncü }
+export const FINAL_STANDINGS = {
+  A: { 1: 'Meksika', 2: 'Güney Afrika', 3: 'Güney Kore', 4: 'Çekya' },
+  B: { 1: 'İsviçre', 2: 'Kanada', 3: 'Bosna-Hersek', 4: 'Katar' },
+  C: { 1: 'Brezilya', 2: 'Fas', 3: 'İskoçya', 4: 'Haiti' },
+  D: { 1: 'ABD', 2: 'Avustralya', 3: 'Paraguay', 4: 'Türkiye' },
+  E: { 1: 'Almanya', 2: 'Fildişi Sahili', 3: 'Ekvador', 4: 'Curaçao' },
+  F: { 1: 'Hollanda', 2: 'Japonya', 3: 'İsveç', 4: 'Tunus' },
+  G: { 1: 'Belçika', 2: 'Mısır', 3: 'İran', 4: 'Yeni Zelanda' },
+  H: { 1: 'İspanya', 2: 'Yeşil Burun Adaları', 3: 'Uruguay', 4: 'Suudi Arabistan' },
+  I: { 1: 'Fransa', 2: 'Norveç', 3: 'Senegal', 4: 'Irak' },
+  J: { 1: 'Arjantin', 2: 'Avusturya', 3: 'Cezayir', 4: 'Ürdün' },
+  K: { 1: 'Kolombiya', 2: 'Portekiz', 3: 'Kongo KDC', 4: 'Özbekistan' },
+  L: { 1: 'İngiltere', 2: 'Hırvatistan', 3: 'Gana', 4: 'Panama' },
+}
+
 export function isMatchOpen(home, away) {
   const key = `${home}_${away}`
   const kickoff = MATCH_TIMES[key]
