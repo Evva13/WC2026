@@ -80,8 +80,6 @@ export default function App() {
             userId={user.id}
             bracketPreds={bracketPreds}
             setBracketPreds={setBracketPreds}
-            bracketResults={results}
-            locked={false}
           />
         )}
         {tab === 'leaderboard' && (
